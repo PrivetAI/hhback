@@ -23,6 +23,7 @@ class HHClient:
             return response.json()
     
     async def exchange_code_for_token(self, code: str) -> dict:
+        """Exchange OAuth code for access token"""
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://hh.ru/oauth/token",
@@ -31,7 +32,7 @@ class HHClient:
                     "client_id": self.client_id,
                     "client_secret": self.client_secret,
                     "code": code,
-                    "redirect_uri": "http://localhost:3000"  # Должен совпадать с настройками в HH
+                    "redirect_uri": "http://localhost:3000"
                 }
             )
             
@@ -43,8 +44,6 @@ class HHClient:
                 )
             
             data = response.json()
-            
-            # Validate response
             if "access_token" not in data:
                 raise HTTPException(
                     status_code=400,
@@ -54,6 +53,7 @@ class HHClient:
             return data
     
     async def get_user_info(self, token: str) -> dict:
+        """Get user information"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{self.base_url}/me",
@@ -69,6 +69,7 @@ class HHClient:
             return response.json()
     
     async def get_resume(self, token: str) -> dict:
+        """Get user's resume"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{self.base_url}/resumes/mine",
@@ -91,9 +92,8 @@ class HHClient:
             return None
     
     async def search_vacancies(self, token: str, params: dict) -> dict:
-        """Search vacancies with any parameters"""
+        """Search vacancies"""
         async with httpx.AsyncClient() as client:
-            # Default params
             if 'per_page' not in params:
                 params['per_page'] = 50
             if 'page' not in params:
@@ -108,6 +108,7 @@ class HHClient:
             return response.json()
     
     async def get_vacancy(self, token: str, vacancy_id: str) -> dict:
+        """Get vacancy details"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{self.base_url}/vacancies/{vacancy_id}",
@@ -117,6 +118,7 @@ class HHClient:
             return response.json()
     
     async def apply_to_vacancy(self, token: str, vacancy_id: str, message: str) -> dict:
+        """Apply to vacancy"""
         async with httpx.AsyncClient() as client:
             resume = await self.get_resume(token)
             if not resume:
