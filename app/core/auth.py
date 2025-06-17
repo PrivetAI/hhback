@@ -1,4 +1,4 @@
-import jwt
+from jose import jwt
 import os
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status

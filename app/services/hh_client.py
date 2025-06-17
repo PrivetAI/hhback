@@ -52,6 +52,26 @@ class HHClient:
             
             return data
     
+    async def refresh_access_token(self, refresh_token: str) -> dict:
+        """Refresh access token using refresh token"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://hh.ru/oauth/token",
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": refresh_token
+                }
+            )
+            
+            if response.status_code != 200:
+                error_data = response.json()
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Token refresh error: {error_data.get('error_description', 'Unknown error')}"
+                )
+            
+            return response.json()
+    
     async def get_user_info(self, token: str) -> dict:
         """Get user information"""
         async with httpx.AsyncClient() as client:

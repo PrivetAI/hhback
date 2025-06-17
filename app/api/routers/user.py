@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
-from ..models.schemas import ResumeResponse, Dictionaries, ResponseHistoryItem
-from ..models.db_models import ResponseHistory
-from ..core.auth import get_current_user_id
-from ..core.database import get_db
-from ..services.hh_service import HHService
+from ...models.schemas import ResumeResponse, Dictionaries, ResponseHistoryItem
+from ...models.db_models import ResponseHistory
+from ...core.auth import get_current_user_id
+from ...core.database import get_db
+from ...services.hh_service import HHService
 
 router = APIRouter(prefix="/api", tags=["user"])
 hh_service = HHService()

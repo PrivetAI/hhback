@@ -22,6 +22,17 @@ class RedisService:
         """Store user's HH token"""
         await self.redis.setex(f"token:{user_id}", expires_in, token)
 
+    async def set_refresh_token(self, user_id: str, refresh_token: str):
+        """Store user's refresh token (30 days)"""
+        await self.redis.setex(f"refresh_token:{user_id}", 2592000, refresh_token)
+    
+    async def get_refresh_token(self, user_id: str) -> Optional[str]:
+        """Get user's refresh token"""
+        token = await self.redis.get(f"refresh_token:{user_id}")
+        if not token:
+            return None
+        return token.decode() if isinstance(token, bytes) else token
+
     async def get_json(self, key: str) -> Optional[Dict[str, Any]]:
         """Get JSON data from Redis"""
         data = await self.redis.get(key)
