@@ -23,7 +23,7 @@ async def get_vacancies(
     per_page: int = Query(20, ge=20, le=100),
     user_id: str = Depends(get_current_user_id)
 ):
-    """Get vacancies list with filters"""
+    """Get vacancies list with details"""
     params = {
         "page": page,
         "per_page": per_page
@@ -44,8 +44,13 @@ async def get_vacancies(
     if schedule:
         params["schedule"] = schedule
     
-    return await hh_service.search_vacancies(user_id, params)
-
+    result = await hh_service.search_vacancies_with_details(user_id, params)
+    
+    # Pre-load next page in background
+    if result.get("items") and len(result["items"]) == per_page:
+        await hh_service.warm_cache_next_page(user_id, params)
+    
+    return result
 @router.get("/vacancy/{vacancy_id}")
 async def get_vacancy_details(
     vacancy_id: str,
